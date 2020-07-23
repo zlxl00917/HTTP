@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div>
+    <div>
+      <div>{{ post.title }}</div>
+      <div>{{ post.content }}</div>
+    </div>
+    <a href="{% url 'home' %}">홈으로</a>
+
+    {% if user.is_authenticated and post.author.pk == user.pk %}
+    <a href="{% url 'edit' post.pk %}">수정하기</a>
+    <a href="{% url 'delete' post.pk %}">삭제하기</a>
+    {% endif %}
+
+    {% for comment in post.comments.all %}
+      <li>{{ comment.content }}</li>
+      {% if user.is_authenticated and comment.author.pk == user.pk %}
+      <a href="{% url 'delete_comment' post.pk comment.pk %}">댓글삭제</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" name="content" placeholder="댓글을 입력하세요">
+      <button type="submit">댓글쓰기</button>
+    </form>
+    <button id="like_button" onclick="like()">좋아요</button>
+    <button id="mine_button" onclick="mine()">찜하기</button>
+    {% endif %}
+    <div id="like-count">좋아요 {{post.likes.count}}개</div>
+  </div>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const like=()=>{
+      axios
+      .post('/like',{ post_pk:"{{post.pk}}"})  
+      .then(response=>document.getElementById('like-count').innerHTML='좋아요'+response.data.like_count+'개')
+      .then(response=>{if(response.data.clicklike){
+          document.getElementById('like_button').style.color='red'
+      } else {
+        document.getElementById('like_button').style.color='black'
+      }
+      })
+
+      .catch(error=>console.error(error))
+      }
+    const mine=()=>{
+      axios
+      .post('/mine',{ post_pk:"{{post.pk}}"})  
+
+      .then(response=>{if(response.data.clickmine){
+          document.getElementById('mine_button').style.color='blue'
+      } else {
+        document.getElementById('mine_button').style.color='black'
+      }
+      })
+
+      .catch(error=>console.error(error))
+      }
+  </script>
+{% endblock content %}

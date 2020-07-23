@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="Ilike">
+    <p>좋아요</p>
+    {% for like in like%}
+    
+    <p><a href="{% url 'detail' like.pk%}"><{{like.title}}></a></p>
+ 
+   
+    {% endfor %}
+</div>
+<div class="Mine">
+    <p>내 찜</p>
+    {% for mine in mine%}
+    
+    <p><a href="{% url 'detail' mine.pk%}"><{{mine.title}}></a></p>
+ 
+ 
+    {% endfor %}
+</div>
+
+{% endblock content %}
